@@ -11,9 +11,14 @@ void iDraw()
 
 }
 
+
+/*function iMouseMove() is called when the user presses and drags the mouse.
+(mx, my) is the position where the mouse pointer is.
+*/
 void iMouseMove(int mx, int my)
 {
-	
+	x = mx;
+	y = my;
 }
 
 void iPassiveMouseMove(int mx, int my)
