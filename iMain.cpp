@@ -1,24 +1,45 @@
 #include "iGraphics.h"
 
-int x = 0;
-int y = 0;
+int loadingScreen;
+int mainMenuScreen;
+
+int loadingBarWidth = 0;
+bool loadingDone = false;
+bool goToMainMenu = false;
 
 void iDraw()
 {
 	iClear();
-	iFilledRectangle(x, y, 100, 100);
-	iSetColor(255, 255, 255);
 
+	if (!goToMainMenu){
+		// Show loading screen background
+		iShowImage(0, 0, 1280, 720, loadingScreen);
+		
+
+		// Draw loading bar fill (white)
+		iSetColor(255, 255, 255);
+		iRectangle(390, 100, 500, 30);
+		iFilledRectangle(390, 100, loadingBarWidth, 30);
+
+		// If loading done, show text prompt
+		if (loadingDone){
+			iSetColor(255, 255, 255);
+			iText(530, 150, "Press SPACE to continue", GLUT_BITMAP_HELVETICA_18);
+		}
+		else{
+			iSetColor(255, 255, 255);
+			iText(390, 140, "Loading...", GLUT_BITMAP_HELVETICA_18);
+		}
+	}
+	else{
+		// Show main menu screen background after loading completes and user presses SPACE
+		iShowImage(0, 0, 1280, 720, mainMenuScreen);
+	}
 }
 
-
-/*function iMouseMove() is called when the user presses and drags the mouse.
-(mx, my) is the position where the mouse pointer is.
-*/
 void iMouseMove(int mx, int my)
 {
-	x = mx;
-	y = my;
+	
 }
 
 void iPassiveMouseMove(int mx, int my)
@@ -31,7 +52,6 @@ void iMouse(int button, int state, int mx, int my)
 	
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-
 		
 	}
 	
@@ -50,42 +70,50 @@ void fixedUpdate()
 {
 	if (isKeyPressed('w') || isSpecialKeyPressed(GLUT_KEY_UP))
 	{
-		y++;
+
 	}
 	if (isKeyPressed('a') || isSpecialKeyPressed(GLUT_KEY_LEFT))
 	{
-		x--;
+
 	}
 	if (isKeyPressed('s') || isSpecialKeyPressed(GLUT_KEY_DOWN))
 	{
-		y--;
+
 	}
 	if (isKeyPressed('d') || isSpecialKeyPressed(GLUT_KEY_RIGHT))
 	{
-		x++;
+
+	}
+	
+	if (!loadingDone){
+
+		loadingBarWidth += 5;
+		if (loadingBarWidth >= 500){
+			loadingBarWidth = 500;
+			loadingDone = true;
+		}
 	}
 
-	if (isKeyPressed(' ')) {
-		// Playing the audio once
-		mciSendString("play ggsong from 0", NULL, 0, NULL);
+	else{
+		if (isKeyPressed(' ')){
+			goToMainMenu = true;
+		}
 	}
+
 }
 
 
 int main()
 {
-	// Opening/Loading the audio files
-	mciSendString("open \"Audios//background.mp3\" alias bgsong", NULL, 0, NULL);
-	mciSendString("open \"Audios//gameover.mp3\" alias ggsong", NULL, 0, NULL);
+	iInitialize(1280, 720, "Marvel Mayhem");
 
-	// Playing the background audio on repeat
-	mciSendString("play bgsong repeat", NULL, 0, NULL);
+	loadingScreen = iLoadImage("BG/loading.png");
 
-	// If the use of an audio is finished, close it to free memory
-	// mciSendString("close bgsong", NULL, 0, NULL);
-	// mciSendString("close ggsong", NULL, 0, NULL);
+	mainMenuScreen = iLoadImage("BG/main.png");
 
-	iInitialize(600, 400, "Project Title");
+	iSetTimer(30, fixedUpdate);
+
 	iStart();
+
 	return 0;
 }
