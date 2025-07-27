@@ -6,6 +6,8 @@ int mainMenuScreen;
 int loadingBarWidth = 0;
 bool loadingDone = false;
 bool goToMainMenu = false;
+bool blinkTextWhite = true;
+
 
 void iDraw()
 {
@@ -14,7 +16,6 @@ void iDraw()
 	if (!goToMainMenu){
 		// Show loading screen background
 		iShowImage(0, 0, 1280, 720, loadingScreen);
-		
 
 		// Draw loading bar fill (white)
 		iSetColor(255, 255, 255);
@@ -23,7 +24,12 @@ void iDraw()
 
 		// If loading done, show text prompt
 		if (loadingDone){
-			iSetColor(255, 255, 255);
+			if (blinkTextWhite) {
+				iSetColor(255, 255, 255); // white
+			}
+			else {
+				iSetColor(0, 0, 0); // black
+			}
 			iText(530, 150, "Press SPACE to continue", GLUT_BITMAP_HELVETICA_18);
 		}
 		else{
@@ -39,26 +45,26 @@ void iDraw()
 
 void iMouseMove(int mx, int my)
 {
-	
+
 }
 
 void iPassiveMouseMove(int mx, int my)
 {
-	
+
 }
 
 void iMouse(int button, int state, int mx, int my)
 {
-	
+
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		
+
 	}
-	
-	
+
+
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
-		
+
 	}
 }
 
@@ -84,7 +90,10 @@ void fixedUpdate()
 	{
 
 	}
-	
+
+}
+
+void loadingBar(){
 	if (!loadingDone){
 
 		loadingBarWidth += 5;
@@ -99,7 +108,10 @@ void fixedUpdate()
 			goToMainMenu = true;
 		}
 	}
+}
 
+void toggleBlinkColor() {
+	blinkTextWhite = !blinkTextWhite;
 }
 
 
@@ -111,7 +123,9 @@ int main()
 
 	mainMenuScreen = iLoadImage("BG/main.png");
 
-	iSetTimer(30, fixedUpdate);
+	iSetTimer(350, toggleBlinkColor); // 350 ms = 0.35 sec toggle
+
+	iSetTimer(10, loadingBar);
 
 	iStart();
 
