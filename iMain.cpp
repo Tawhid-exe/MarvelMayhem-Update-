@@ -1,13 +1,13 @@
 #include "iGraphics.h"
+#include "menu.hpp"
 
 int loadingScreen;
-int mainMenuScreen;
 
 int loadingBarWidth = 0;
 bool loadingDone = false;
 bool goToMainMenu = false;
-bool blinkTextWhite = true;
 
+bool blinkTextWhite = true;
 
 void iDraw()
 {
@@ -15,7 +15,7 @@ void iDraw()
 
 	if (!goToMainMenu){
 		// Show loading screen background
-		iShowImage(0, 0, 1280, 720, loadingScreen);
+		iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, loadingScreen);
 
 		// Draw loading bar fill (white)
 		iSetColor(255, 255, 255);
@@ -39,18 +39,19 @@ void iDraw()
 	}
 	else{
 		// Show main menu screen background after loading completes and user presses SPACE
-		iShowImage(0, 0, 1280, 720, mainMenuScreen);
+		hoverAnimation();
 	}
 }
 
 void iMouseMove(int mx, int my)
 {
-
+	
 }
 
 void iPassiveMouseMove(int mx, int my)
 {
 
+	hover(mx, my);
 }
 
 void iMouse(int button, int state, int mx, int my)
@@ -58,7 +59,9 @@ void iMouse(int button, int state, int mx, int my)
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-
+		if (goToMainMenu){
+			handleMenuClick(mx, my);
+		}
 	}
 
 
@@ -117,11 +120,11 @@ void toggleBlinkColor() {
 
 int main()
 {
-	iInitialize(1280, 720, "Marvel Mayhem");
+	iInitialize(SCREEN_WIDTH, SCREEN_HEIGHT, "Marvel Mayhem");
 
 	loadingScreen = iLoadImage("BG/loading.png");
 
-	mainMenuScreen = iLoadImage("BG/main.png");
+	loadMenuAssets();
 
 	iSetTimer(350, toggleBlinkColor); // 350 ms = 0.35 sec toggle
 
