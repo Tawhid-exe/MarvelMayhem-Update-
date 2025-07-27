@@ -1,7 +1,8 @@
 #include "iGraphics.h"
+#include "menu.hpp"
 
 int loadingScreen;
-int mainMenuScreen;
+
 
 int loadingBarWidth = 0;
 bool loadingDone = false;
@@ -11,29 +12,26 @@ void iDraw()
 {
 	iClear();
 
-	if (!goToMainMenu){
-		// Show loading screen background
-		iShowImage(0, 0, 1280, 720, loadingScreen);
-		
+	if (!goToMainMenu) {
+		// Show loading screen
+		iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, loadingScreen);
 
-		// Draw loading bar fill (white)
+		// Loading bar frame and fill
 		iSetColor(255, 255, 255);
 		iRectangle(390, 100, 500, 30);
 		iFilledRectangle(390, 100, loadingBarWidth, 30);
 
-		// If loading done, show text prompt
-		if (loadingDone){
-			iSetColor(255, 255, 255);
+		// Loading text
+		if (loadingDone) {
 			iText(530, 150, "Press SPACE to continue", GLUT_BITMAP_HELVETICA_18);
 		}
-		else{
-			iSetColor(255, 255, 255);
+		else {
 			iText(390, 140, "Loading...", GLUT_BITMAP_HELVETICA_18);
 		}
 	}
-	else{
-		// Show main menu screen background after loading completes and user presses SPACE
-		iShowImage(0, 0, 1280, 720, mainMenuScreen);
+	else {
+		// Show the actual menu screen
+		showMenu();
 	}
 }
 
@@ -47,18 +45,9 @@ void iPassiveMouseMove(int mx, int my)
 	
 }
 
-void iMouse(int button, int state, int mx, int my)
-{
-	
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-	{
-		
-	}
-	
-	
-	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-	{
-		
+void iMouse(int button, int state, int mx, int my) {
+	if (goToMainMenu) {
+		handleMenuClick(button, state, mx, my); // Handle clicks only after loading
 	}
 }
 
@@ -85,18 +74,23 @@ void fixedUpdate()
 
 	}
 	
-	if (!loadingDone){
-
+	if (!loadingDone) {
 		loadingBarWidth += 5;
-		if (loadingBarWidth >= 500){
+
+		if (loadingBarWidth >= 500) {
 			loadingBarWidth = 500;
 			loadingDone = true;
 		}
 	}
-
-	else{
-		if (isKeyPressed(' ')){
+	else {
+		// Wait for SPACE to continue to menu
+		if (isKeyPressed(' ')) {
 			goToMainMenu = true;
+
+			// Load menu assets only once
+			if (mainMenuScreen == -1) {
+				loadMenuAssets();
+			}
 		}
 	}
 
@@ -105,15 +99,15 @@ void fixedUpdate()
 
 int main()
 {
-	iInitialize(1280, 720, "Marvel Mayhem");
+	iInitialize(SCREEN_WIDTH, SCREEN_HEIGHT, "Marvel Mayhem");
 
-	loadingScreen = iLoadImage("BG/loading.png");
+	// Load the loading screen background image
+	loadingScreen = iLoadImage("Images/LScreen.jpg");
 
-	mainMenuScreen = iLoadImage("BG/main.png");
-
+	// Start the update timer
 	iSetTimer(30, fixedUpdate);
 
-	iStart();
+	iStart(); // Start the graphics engine
 
 	return 0;
 }
