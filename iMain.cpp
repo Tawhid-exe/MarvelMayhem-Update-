@@ -1,6 +1,7 @@
 #include "iGraphics.h"
 #include "menu.hpp"
 #include "character.hpp"
+#include "pause.hpp"
 
 Character captainAmericaP1;
 Character captainAmericaP2;
@@ -45,6 +46,14 @@ void iDraw()
 				//captainAmericaP2.moveX = 820;
 				captainAmericaP2.draw();
 			}
+			
+			// paused button
+			iShowImage(pauseButton.x, pauseButton.y, pauseButton.width, pauseButton.height, pauseButtonImage);
+
+			// If the game is paused, show the pause menu
+			if (currentGameState == PAUSED) {
+				showPauseMenu();
+			}
 
 		}
 
@@ -59,16 +68,51 @@ void iMouseMove(int mx, int my)
 void iPassiveMouseMove(int mx, int my)
 {
 	if (goToMainMenu) {
-		// Handle hover Animation
-		handleHoverAnimation(mx, my);
+		// If in game and paused, handle pause menu hover
+		if (currentScreen == 20 && currentGameState == PAUSED) {
+			handlePauseHoverAnimation(mx, my);
+		}
+		else {
+			// Handle main menu hover Animation
+			handleHoverAnimation(mx, my);
+		}
 	}
 }
 
 void iMouse(int button, int state, int mx, int my)
 {
 	if (goToMainMenu) {
-		// Handle menu clicks only after the loading screen
-		handleMenuClick(button, state, mx, my);
+		if (currentScreen == 20) { // Clicks inside the arena screen
+			if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+				if (currentGameState == PAUSED) {
+					// If paused, check for clicks on the pause menu
+					int clickedButtonIndex = handlePauseMenuClick(mx, my);
+					if (clickedButtonIndex == 0) { // Resume
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 1) { // Restart
+						resetCharacters(captainAmericaP1, captainAmericaP2);
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 2) { // Character Selection
+						resetCharacters(captainAmericaP1, captainAmericaP2);
+						currentScreen = 10; // Go back to character selection
+						currentGameState = PLAYING; // Reset state for next time
+					}
+				}
+				else {
+					// If playing, check for clicks on the main pause button
+					if (mx >= pauseButton.x && mx <= pauseButton.x + pauseButton.width &&
+						my >= pauseButton.y && my <= pauseButton.y + pauseButton.height) {
+						currentGameState = PAUSED;
+					}
+				}
+			}
+		}
+		else {
+			// Handle menu clicks only after the loading screen
+			handleMenuClick(button, state, mx, my);
+		}
 	}
 }
 
@@ -78,7 +122,7 @@ void iMouse(int button, int state, int mx, int my)
 // GLUT_KEY_LEFT, GLUT_KEY_UP, GLUT_KEY_RIGHT, GLUT_KEY_DOWN, GLUT_KEY_PAGE UP, GLUT_KEY_PAGE DOWN, GLUT_KEY_HOME, GLUT_KEY_END, GLUT_KEY_INSERT
 
 void fixedUpdate() {
-	if (!goToMainMenu || currentScreen != 20) return;
+	if (!goToMainMenu || currentScreen != 20 || currentGameState == PAUSED) return;
 
 	// Player 1 controls (WASD + FEQ)
 	handleInputMovementP1(captainAmericaP1);
@@ -111,6 +155,7 @@ void loadingBar(){
 				loadMenuAssets();
 				loadCharacterSelectionAssets();
 				loadArenaAssets();
+				loadPauseAssets();
 			}
 		}
 	}
@@ -139,7 +184,8 @@ void toggleBlinkColor() {
 
 void updateCharacters() {
 	// Only advance frames if we’re on the gameplay screen
-	if (currentScreen == 20){
+	// Only update character animations if the game is playing
+	if (currentScreen == 20 && currentGameState == PLAYING){
 		if(selectedCharacterIndexP1 == 2) captainAmericaP1.update();
 		if(selectedCharacterIndexP2 == 2) captainAmericaP2.update();
 		// ironMan.update();
