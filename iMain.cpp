@@ -154,6 +154,7 @@ void loadingBar(){
 			if (mainMenuScreen == -1){
 				loadMenuAssets();
 				loadCharacterSelectionAssets();
+				loadCharacterSelectionAssetsForArcade();
 				loadArenaAssets();
 				loadPauseAssets();
 			}
@@ -183,7 +184,7 @@ void toggleBlinkColor() {
 }
 
 void updateCharacters() {
-	// Only advance frames if we’re on the gameplay screen
+	// Only advance frames if weâ€™re on the gameplay screen
 	// Only update character animations if the game is playing
 	if (currentScreen == 20 && currentGameState == PLAYING){
 		if(selectedCharacterIndexP1 == 2) captainAmericaP1.update();
@@ -283,7 +284,7 @@ jumpInProgress = false;
 if (!jumpInProgress && captainAmerica.characterState != ATTACK) {
 if (moveRight || moveLeft) captainAmerica.setState(WALK);
 else captainAmerica.setState(IDLE);
-// Safety check — never below ground
+// Safety check â€” never below ground
 if (captainAmerica.moveY < captainAmerica.baseY) {
 captainAmerica.moveY = captainAmerica.baseY;
 }
@@ -310,4 +311,5 @@ captainAmerica.setState(ATTACK); // mid-air attack
 
 
 }
+
 */
