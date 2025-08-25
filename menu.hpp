@@ -188,6 +188,7 @@ void showMenu() {
 				iShowImage(newX, newY, newWidth, newHeight, buttonImages[0]);
 			}
 		}
+
 		else if (currentScreen == 11) {
 			iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, characterSelectionBackground);
 
@@ -204,7 +205,6 @@ void showMenu() {
 				iShowImage(characterButtons[selectedCharacter].x - 40, characterButtons[selectedCharacter].y - 40, 210, 210, selectionImages[0]);
 				iShowImage(520, 60, 250, 100, buttonImages[0]);
 			}
-
 			// Hover effect
 			if (hoveredButtonIndex != -1) {
 				int i = hoveredButtonIndex;
@@ -216,7 +216,7 @@ void showMenu() {
 				iShowImage(newX, newY, newWidth, newHeight, buttonImages[0]);
 			}
 		}
-		
+
 		// Back Button
 		if (backButtonHover) {
 			double zoomFactor = 1.1;
@@ -379,7 +379,7 @@ void handleHoverAnimation(int mx, int my){
 				hoveredButtonIndex = 0;
 			}
 		}
-	}	
+	}
 	else { // On any other sub-screen (Settings, About, Option 1, Option 2)
 		// back button hover
 		if (mx >= backButton.x && mx <= backButton.x + backButton.width &&
@@ -436,7 +436,7 @@ void loadMenuAssets() {
 	}
 
 }
-void loadCharacterAndArenaImages () {
+void loadCharacterAndArenaImages() {
 	// Load character images
 	for (int i = 0; i < CHARACTER_COUNT; i++) {
 		char imagePath[100];
@@ -490,7 +490,7 @@ void loadCharacterSelectionAssetsForArcade() {
 	// Loading Character and Arena Images
 	loadCharacterAndArenaImages();
 
-	// Position settings of characters
+// Position settings of characters
 	int charWidth = 130, charHeight = 130;
 	int spacingX = 80, spacingY = 50;
 	int cols = 3, rows = 2;
@@ -524,4 +524,3 @@ void showArenaImages(){
 }
 
 #endif 
-

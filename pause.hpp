@@ -33,11 +33,11 @@ void resetCharacters(Character &p1, Character &p2);
 * This function should be called once during game initialization.
 */
 void loadPauseAssets() {
-	pauseMenuBackground = iLoadImage("Images/BG/L2.png");
-	pauseButtonImage = iLoadImage("Images/UiElements/setting_Icon.png");
+	pauseMenuBackground = iLoadImage("BG/pauseScreen3.png");
+	pauseButtonImage = iLoadImage("UiElements/setting_Icon2.png");
 
 	// Define the position and size of the main pause button in the arena
-	pauseButton.x = SCREEN_WIDTH - 120;
+	pauseButton.x = SCREEN_WIDTH - 80;
 	pauseButton.y = SCREEN_HEIGHT - 70;
 	pauseButton.width = 50;
 	pauseButton.height = 50;
@@ -136,6 +136,5 @@ void resetCharacters(Character &p1, Character &p2) {
 	p2.jumpInProgress = false;
 	p2.setState(IDLE);
 }
-
 
 #endif // PAUSE_HPP

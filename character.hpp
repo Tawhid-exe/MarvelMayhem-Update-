@@ -1,4 +1,4 @@
-//#include "iGraphics.h"
+﻿//#include "iGraphics.h"
 #ifndef CHARACTER_HPP
 #define CHARACTER_HPP
 #include <cstdlib> // For rand()
@@ -277,4 +277,116 @@ void handleDefaultState(Character &c1, bool moveRight, bool moveLeft) {
 }
 
 #endif
+
+
+
+
+
+
+// --------------- might use later -------------------------
+/*
+void loadCaptainAmerica(Character& ca) {
+ca.name = "Captain America";
+
+loadAnimation(ca.idleSprites, ca.idleCount, "Characters/CaptainAmerica/Idle/ca_idle_", 1);
+loadAnimation(ca.moveSprites, ca.moveCount, "Characters/CaptainAmerica/Walk/ca_walk_", 12);
+loadAnimation(ca.moveBackSprites, ca.moveBackCount, "Characters/CaptainAmerica/WalkBack/ca_back_", 12); // optional
+loadAnimation(ca.jumpSprites, ca.jumpCount, "Characters/CaptainAmerica/Jump/ca_jump_", 8);
+loadAnimation(ca.attackSprites, ca.attackCount, "Characters/CaptainAmerica/Attack/ca_atk_", 10);
+loadAnimation(ca.skillSprites, ca.skillCount, "Characters/CaptainAmerica/Skill/ca_skill_", 15);
+loadAnimation(ca.ultimateSprites, ca.ultimateCount, "Characters/CaptainAmerica/Ultimate/ca_ult_", 20);
+loadAnimation(ca.deadSprites, ca.deadCount, "Characters/CaptainAmerica/Dead/ca_dead_", 10);
+}
+
+void draw() {
+	int* spriteArray = nullptr;
+	int count = 0;
+
+	switch (characterState) {
+	case IDLE:
+		if (facingRight) {
+			spriteArray = idleSprites_R;
+			count = idleCount_R;
+		}
+		else {
+			spriteArray = idleSprites_L;
+			count = idleCount_L;
+		} break;
+	case WALK:
+		if (facingRight) {
+			spriteArray = walkSprites_R;
+			count = walkCount_R;
+		}
+		else {
+			spriteArray = walkSprites_L;
+			count = walkCount_L;
+		} break;
+
+	case JUMP:
+		if (facingRight) {
+			spriteArray = jumpSprites_R;
+			count = jumpCount_R;
+		}
+		else {
+			spriteArray = jumpSprites_L;
+			count = jumpCount_L;
+		} break;
+
+	case ATTACK:
+		if (facingRight) {
+			spriteArray = attackSprites_R;
+			count = attackCount_R;
+		}
+		else {
+			spriteArray = attackSprites_L;
+			count = attackCount_L;
+		} break;
+
+	case SKILL:
+		if (facingRight) {
+			spriteArray = skillSprites_R;
+			count = skillCount_R;
+		}
+		else {
+			spriteArray = skillSprites_L;
+			count = skillCount_L;
+		} break;
+
+	case ULTIMATE:
+		if (facingRight) {
+			spriteArray = ultimateSprites_R;
+			count = ultimateCount_R;
+		}
+		else {
+			spriteArray = ultimateSprites_L;
+			count = ultimateCount_L;
+		} break;
+
+	case DEAD:
+		if (facingRight) {
+			spriteArray = deadSprites_R;
+			count = deadCount_R;
+		}
+		else {
+			spriteArray = deadSprites_L;
+			count = deadCount_L;
+		} break;
+	}
+
+	if (spriteArray && spriteArray[currentFrame] >= 0) {
+		iShowImage(moveX, moveY, 100, 140, spriteArray[currentFrame]);
+	}
+	else {
+		printf("Invalid image at frame %d\n", currentFrame);
+	}
+}
+
+*/
+
+
+
+
+
+
+
 
