@@ -22,6 +22,8 @@
 
 int selectedCharacterIndexP1 = 2; //default // index for spawning character in areana
 int selectedCharacterIndexP2 = 2; //default
+
+int selectedCharacterIndexArcade = -1; //store the selected character for Arcade Mode
 // 1 for ironman
 // 2 for cap
 // 3 for thor
@@ -308,6 +310,7 @@ void handleMenuClick(int button, int state, int mx, int my) {
 					if (mx >= characterButtons[i].x && mx <= characterButtons[i].x + characterButtons[i].width &&
 						my >= characterButtons[i].y && my <= characterButtons[i].y + characterButtonsP1[i].height) {
 						selectedCharacter = i;
+						selectedCharacterIndexArcade = i + 1; // FIX: This line was missing
 					}
 
 					// Entering Arena Screen
