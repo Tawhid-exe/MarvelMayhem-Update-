@@ -26,12 +26,11 @@ void showPauseMenu();
 int handlePauseMenuClick(int mx, int my);
 void handlePauseHoverAnimation(int mx, int my);
 void resetCharacters(Character &p1, Character &p2);
+void resetArcadePlayer(Character &player, Character &ai); // MODIFIED: Added AI to reset
 
 
-/**
-* @brief Loads all necessary image assets for the pause menu and pause button.
-* This function should be called once during game initialization.
-*/
+//This function should be called once during game initialization.
+
 void loadPauseAssets() {
 	pauseMenuBackground = iLoadImage("BG/pauseScreen3.png");
 	pauseButtonImage = iLoadImage("UiElements/setting_Icon2.png");
@@ -52,15 +51,8 @@ void loadPauseAssets() {
 	}
 }
 
-/**
-* @brief Draws the pause menu UI on the screen.
-* This includes the semi-transparent background and the option buttons.
-*/
-void showPauseMenu() {
-	// Draw a semi-transparent overlay
-	//iSetColor(0, 0, 0);
-	//iFilledRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+void showPauseMenu() {
 	// Show the pause menu background image (the popup)
 	iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, pauseMenuBackground);
 
@@ -81,10 +73,10 @@ void showPauseMenu() {
 }
 
 /**
-* @brief Checks if a click occurred on any of the pause menu buttons.
-* @param mx The x-coordinate of the mouse click.
-* @param my The y-coordinate of the mouse click.
-* @return The index of the clicked button (0-2), or -1 if no button was clicked.
+*Checks if a click occurred on any of the pause menu buttons.
+* mx The x-coordinate of the mouse click.
+* my The y-coordinate of the mouse click.
+*  index of the clicked button (0-2), or -1 if no button was clicked.
 */
 int handlePauseMenuClick(int mx, int my) {
 	for (int i = 0; i < PAUSE_BUTTON_COUNT; i++) {
@@ -97,9 +89,9 @@ int handlePauseMenuClick(int mx, int my) {
 }
 
 /**
-* @brief Handles the hover effect for pause menu buttons.
-* @param mx The x-coordinate of the mouse.
-* @param my The y-coordinate of the mouse.
+*  Handles the hover effect for pause menu buttons.
+* mx The x-coordinate of the mouse.
+* my The y-coordinate of the mouse.
 */
 void handlePauseHoverAnimation(int mx, int my) {
 	hoveredPauseButtonIndex = -1; // Reset hover state
@@ -113,9 +105,9 @@ void handlePauseHoverAnimation(int mx, int my) {
 }
 
 /**
-* @brief Resets the state and position of both characters.
-* @param p1 Reference to the Player 1 character object.
-* @param p2 Reference to the Player 2 character object.
+*  Resets the state and position of both characters in 1v1 mode.
+* p1 Reference to the Player 1 character object.
+*  p2 Reference to the Player 2 character object.
 */
 void resetCharacters(Character &p1, Character &p2) {
 	// Player 1 Reset
@@ -136,5 +128,29 @@ void resetCharacters(Character &p1, Character &p2) {
 	p2.jumpInProgress = false;
 	p2.setState(IDLE);
 }
+
+/**
+* Resets the state and position of the arcade player and AI.
+*  player Reference to the arcade player character object.
+* ai Reference to the AI character object.
+*/
+void resetArcadePlayer(Character &player, Character &ai) {
+	player.moveX = 200;
+	player.moveY = player.baseY;
+	player.facingRight = true;
+	player.hp = 1000;
+	player.alive = true;
+	player.jumpInProgress = false;
+	player.setState(IDLE);
+
+	ai.moveX = 980;
+	ai.moveY = ai.baseY;
+	ai.facingRight = false;
+	ai.hp = 1000;
+	ai.alive = true;
+	ai.jumpInProgress = false;
+	ai.setState(IDLE);
+}
+
 
 #endif // PAUSE_HPP
