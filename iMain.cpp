@@ -261,8 +261,9 @@ void updateCharacters() {
 		// ironMan.update();
 	}
 
-	else if (currentScreen == 30 && currentGameState == PLAYING){
-		if (selectedCharacterIndexP1 == 2) captainAmericaP1.update();
+	// Update arcade characters' animations	
+	else if (currentScreen == 30 && currentGameState == PLAYING) {		else if (currentScreen == 30 && currentGameState == PLAYING){
+		updateArcadeCharacters();
 
 	}
 }
@@ -300,6 +301,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
