@@ -77,6 +77,9 @@ void iDraw()
 		}
 
 	}
+
+	// Update previous screen state at the end of the draw call
+	previousScreen = currentScreen;
 }
 
 void iMouseMove(int mx, int my)
@@ -268,6 +271,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
