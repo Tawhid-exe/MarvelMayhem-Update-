@@ -16,6 +16,8 @@ bool goToMainMenu = false;
 bool blinkTextWhite = true;
 static bool assetsLoaded = false;
 
+int previousScreen = -1; // To track screen transitions
+
 // had to declare the function definition here otherwise it was not working 
 void loadingScreenText();
 
@@ -261,4 +263,5 @@ int main()
 
 	return 0;
 }
+
 
