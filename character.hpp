@@ -245,6 +245,9 @@ void handleJump(Character &c1, bool wPressed) {
 
 // extra frame count handling needed for single press f and long press f anymation cycle
 void handleAttack(Character &c1, bool fPressed) {
+	if (c1.jumpInProgress && fPressed) {
+		c1.setState(ATTACK);
+	}
 	if (c1.characterState == ATTACK) {
 		int maxAtk = c1.facingRight ? c1.attackCount_R : c1.attackCount_L;
 		if (c1.currentFrame >= maxAtk - 1) {
@@ -300,6 +303,7 @@ void handleDefaultState(Character &c1, bool moveRight, bool moveLeft) {
 }
 
 #endif
+
 
 
 
