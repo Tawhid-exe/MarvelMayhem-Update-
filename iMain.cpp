@@ -91,7 +91,7 @@ void iPassiveMouseMove(int mx, int my)
 {
 	if (goToMainMenu) {
 		// If in game and paused, handle pause menu hover
-		if (currentScreen == 20 && currentGameState == PAUSED) {
+		if ((currentScreen == 20 || currentScreen == 30) && currentGameState == PAUSED) {
 			handlePauseHoverAnimation(mx, my);
 		}
 		else {
@@ -271,6 +271,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
