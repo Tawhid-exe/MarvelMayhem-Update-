@@ -195,7 +195,7 @@ void fixedUpdate() {
 	}
 
 	// Arcade Mode (screen 30) - Only Player 1
-	else if (currentScreen == 30) {
+	else if (goToMainMenu && currentScreen == 30 && currentGameState != PAUSED) {
 		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
 		handleDefaultState(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
 		handleJump(captainAmericaP1, isKeyPressed('w'));
@@ -300,6 +300,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
