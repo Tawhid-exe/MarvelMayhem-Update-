@@ -2,6 +2,8 @@
 #include "menu.hpp"
 #include "character.hpp"
 #include "pause.hpp"
+#include "ai.hpp"	
+#include "arcade.hpp" 
 
 Character captainAmericaP1;
 Character captainAmericaP2;
@@ -259,3 +261,4 @@ int main()
 
 	return 0;
 }
+
