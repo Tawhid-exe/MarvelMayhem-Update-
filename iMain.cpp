@@ -131,6 +131,35 @@ void iMouse(int button, int state, int mx, int my)
 				}
 			}
 		}
+
+			// Clicks inside the Arcade Mode arena screen
+		else if (currentScreen == 30) {
+			if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+				if (currentGameState == PAUSED) {
+					// If paused, check for clicks on the pause menu
+					int clickedButtonIndex = handlePauseMenuClick(mx, my);
+					if (clickedButtonIndex == 0) { // Resume
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 1) { // Restart
+						resetArcadePlayer(arcadePlayer, arcadeAI);
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 2) { // Character Selection
+						resetArcadePlayer(arcadePlayer, arcadeAI);
+						currentScreen = 11; // Go back to arcade character selection
+						currentGameState = PLAYING; // Reset state for next time
+					}
+				}
+				else {
+					// If playing, check for clicks on the main pause button
+					if (mx >= pauseButton.x && mx <= pauseButton.x + pauseButton.width &&
+						my >= pauseButton.y && my <= pauseButton.y + pauseButton.height) {
+						currentGameState = PAUSED;
+					}
+				}
+			}
+		}
 		else {
 			// Handle menu clicks only after the loading screen
 			handleMenuClick(button, state, mx, my);
@@ -271,6 +300,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
