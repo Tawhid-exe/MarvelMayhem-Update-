@@ -24,6 +24,8 @@
 
 int selectedCharacterIndexP1 = 2; //default // index for spawning character in areana
 int selectedCharacterIndexP2 = 2; //default
+
+int selectedCharacterIndexArcade = -1;
 // 1 for ironman
 // 2 for cap
 // 3 for thor
@@ -602,3 +604,4 @@ void updateBackgroundScroll(Character &player) {
 
 
 #endif 
+
