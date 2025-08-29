@@ -194,13 +194,20 @@ void fixedUpdate() {
 
 	}
 
-	// Arcade Mode (screen 30) - Only Player 1
+	// Arcade Mode Controls
 	else if (goToMainMenu && currentScreen == 30 && currentGameState != PAUSED) {
-		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
-		handleDefaultState(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
-		handleJump(captainAmericaP1, isKeyPressed('w'));
-		handleAttack(captainAmericaP1, isKeyPressed('f'));
-		handleUltimate(captainAmericaP1, isKeyPressed('q'));
+		// Player controls
+		handleInputMovement(arcadePlayer, isKeyPressed('d'), isKeyPressed('a'));
+		handleDefaultState(arcadePlayer, isKeyPressed('d'), isKeyPressed('a'));
+		handleJump(arcadePlayer, isKeyPressed('w'));
+		handleAttack(arcadePlayer, isKeyPressed('f'));
+		handleUltimate(arcadePlayer, isKeyPressed('q'));
+
+
+		// AI Controls
+		handleJump(arcadeAI, false);
+		handleAI(arcadeAI, arcadePlayer);
+	
 
 		updateBackgroundScroll(captainAmericaP1);
 	}
@@ -301,6 +308,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
