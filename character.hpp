@@ -1,6 +1,7 @@
-﻿//#include "iGraphics.h"
+//#include "iGraphics.h"
 #ifndef CHARACTER_HPP
 #define CHARACTER_HPP
+#include "menu.hpp"
 #include <cstdlib> // For rand()
 #include <ctime>   // For srand()
 #include <iostream>
@@ -152,6 +153,7 @@ struct Character{
 	void handleJump();
 	void handleAttack();
 	void handleDefaultState();
+	void updateBackgroundScroll(Character &player);
 };
 
 //Character c1, c2;
@@ -192,15 +194,17 @@ void loadCaptainAmerica(Character &ca) {
 	loadSprites(ca.attackSprites_R, ca.attackCount_R, "SPRITE/CaptainAmerica/ATTACK_R", "attack", 8);
 	loadSprites(ca.attackSprites_L, ca.attackCount_L, "SPRITE/CaptainAmerica/ATTACK_L", "attack", 8);
 
-	//loadSprites(ca.skillSprites_R, ca.skillCount_R, "SPRITE/CaptainAmerica/SKILL_R", "skill", 15);
-	//loadSprites(ca.skillSprites_L, ca.skillCount_L, "SPRITE/CaptainAmerica/SKILL_L", "skill", 15);
+	//loadSprites(ca.skillSprites_R, ca.skillCount_R, "SPRITE/CaptainAmerica/SKILL_R", "skill", 12);
+	//loadSprites(ca.skillSprites_L, ca.skillCount_L, "SPRITE/CaptainAmerica/SKILL_L", "skill", 12);
 
-	//loadSprites(ca.ultimateSprites_R, ca.ultimateCount_R, "SPRITE/CaptainAmerica/ULTIMATE_R", "ultimate", 20);
-	//loadSprites(ca.ultimateSprites_L, ca.ultimateCount_L, "SPRITE/CaptainAmerica/ULTIMATE_L", "ultimate", 20);
+	loadSprites(ca.ultimateSprites_R, ca.ultimateCount_R, "SPRITE/CaptainAmerica/ULTIMATE_R", "ult", 6);
+	loadSprites(ca.ultimateSprites_L, ca.ultimateCount_L, "SPRITE/CaptainAmerica/ULTIMATE_L", "ult", 6);
 
 	//loadSprites(ca.deadSprites_R, ca.deadCount_R, "SPRITE/CaptainAmerica/DEAD_R", "dead", 10);
 	//loadSprites(ca.deadSprites_L, ca.deadCount_L, "SPRITE/CaptainAmerica/DEAD_L", "dead", 10);
 }
+
+
 
 void handleInputMovement(Character &c1, bool moveRight, bool moveLeft) {
 	if (moveLeft) {
@@ -238,6 +242,8 @@ void handleJump(Character &c1, bool wPressed) {
 	}
 }
 
+
+// extra frame count handling needed for single press f and long press f anymation cycle
 void handleAttack(Character &c1, bool fPressed) {
 	if (c1.jumpInProgress && fPressed) {
 		c1.setState(ATTACK);
@@ -246,12 +252,13 @@ void handleAttack(Character &c1, bool fPressed) {
 		int maxAtk = c1.facingRight ? c1.attackCount_R : c1.attackCount_L;
 		if (c1.currentFrame >= maxAtk - 1) {
 			if (fPressed) {
-				c1.currentFrame = 0;
+				c1.currentFrame = 0;  // holding f attack animation infinite loop
 			}
 			else {
-				c1.setState(IDLE);
+				c1.setState(IDLE);  // release f to stop attacking
 			}
 		}
+		return;
 	}
 	else if (fPressed) {
 		c1.setState(ATTACK);
@@ -259,9 +266,28 @@ void handleAttack(Character &c1, bool fPressed) {
 }
 
 
+void handleUltimate(Character &c1, bool qPressed) {
+	if (c1.characterState == ULTIMATE) {
+		int maxUlt = c1.facingRight ? c1.ultimateCount_R : c1.ultimateCount_L;
+		if (c1.currentFrame >= maxUlt - 1) {
+			if (qPressed) {
+				c1.currentFrame = 0;
+			}
+			else {
+				c1.setState(IDLE);
+			}
+		}
+		return;
+	}
+	else if (qPressed) {
+		c1.setState(ULTIMATE);
+	}
+}
+
+
 
 void handleDefaultState(Character &c1, bool moveRight, bool moveLeft) {
-	if (!c1.jumpInProgress && c1.characterState != ATTACK) {
+	if (!c1.jumpInProgress && c1.characterState != ATTACK && c1.characterState != ULTIMATE) {
 		if (moveRight || moveLeft) {
 			c1.setState(WALK);
 		}
@@ -282,106 +308,6 @@ void handleDefaultState(Character &c1, bool moveRight, bool moveLeft) {
 
 
 
-
-// --------------- might use later -------------------------
-/*
-void loadCaptainAmerica(Character& ca) {
-ca.name = "Captain America";
-
-loadAnimation(ca.idleSprites, ca.idleCount, "Characters/CaptainAmerica/Idle/ca_idle_", 1);
-loadAnimation(ca.moveSprites, ca.moveCount, "Characters/CaptainAmerica/Walk/ca_walk_", 12);
-loadAnimation(ca.moveBackSprites, ca.moveBackCount, "Characters/CaptainAmerica/WalkBack/ca_back_", 12); // optional
-loadAnimation(ca.jumpSprites, ca.jumpCount, "Characters/CaptainAmerica/Jump/ca_jump_", 8);
-loadAnimation(ca.attackSprites, ca.attackCount, "Characters/CaptainAmerica/Attack/ca_atk_", 10);
-loadAnimation(ca.skillSprites, ca.skillCount, "Characters/CaptainAmerica/Skill/ca_skill_", 15);
-loadAnimation(ca.ultimateSprites, ca.ultimateCount, "Characters/CaptainAmerica/Ultimate/ca_ult_", 20);
-loadAnimation(ca.deadSprites, ca.deadCount, "Characters/CaptainAmerica/Dead/ca_dead_", 10);
-}
-
-void draw() {
-	int* spriteArray = nullptr;
-	int count = 0;
-
-	switch (characterState) {
-	case IDLE:
-		if (facingRight) {
-			spriteArray = idleSprites_R;
-			count = idleCount_R;
-		}
-		else {
-			spriteArray = idleSprites_L;
-			count = idleCount_L;
-		} break;
-	case WALK:
-		if (facingRight) {
-			spriteArray = walkSprites_R;
-			count = walkCount_R;
-		}
-		else {
-			spriteArray = walkSprites_L;
-			count = walkCount_L;
-		} break;
-
-	case JUMP:
-		if (facingRight) {
-			spriteArray = jumpSprites_R;
-			count = jumpCount_R;
-		}
-		else {
-			spriteArray = jumpSprites_L;
-			count = jumpCount_L;
-		} break;
-
-	case ATTACK:
-		if (facingRight) {
-			spriteArray = attackSprites_R;
-			count = attackCount_R;
-		}
-		else {
-			spriteArray = attackSprites_L;
-			count = attackCount_L;
-		} break;
-
-	case SKILL:
-		if (facingRight) {
-			spriteArray = skillSprites_R;
-			count = skillCount_R;
-		}
-		else {
-			spriteArray = skillSprites_L;
-			count = skillCount_L;
-		} break;
-
-	case ULTIMATE:
-		if (facingRight) {
-			spriteArray = ultimateSprites_R;
-			count = ultimateCount_R;
-		}
-		else {
-			spriteArray = ultimateSprites_L;
-			count = ultimateCount_L;
-		} break;
-
-	case DEAD:
-		if (facingRight) {
-			spriteArray = deadSprites_R;
-			count = deadCount_R;
-		}
-		else {
-			spriteArray = deadSprites_L;
-			count = deadCount_L;
-		} break;
-	}
-
-	if (spriteArray && spriteArray[currentFrame] >= 0) {
-		iShowImage(moveX, moveY, 100, 140, spriteArray[currentFrame]);
-	}
-	else {
-		printf("Invalid image at frame %d\n", currentFrame);
-	}
-}
-
-*/
 
 
 
