@@ -58,11 +58,16 @@ void iDraw()
 				showPauseMenu();
 			}
 		}
-		if (currentScreen == 30){
-			showDynamicArenaBG();
-			if (selectedCharacterIndexP1 == 2) captainAmericaP1.draw();
-			
-			// paused button
+		// Logic for Arcade Mode Screen (30)
+		else if (currentScreen == 30) {
+			// Check if we just entered the arcade screen to load characters once
+			if (previousScreen != 30) {
+				loadArcadeCharacters();
+			}
+
+			drawArcadeScene();
+
+			// Show pause button in Arcade Mode
 			iShowImage(pauseButton.x, pauseButton.y, pauseButton.width, pauseButton.height, pauseButtonImage);
 
 			// If the game is paused, show the pause menu
@@ -263,5 +268,6 @@ int main()
 
 	return 0;
 }
+
 
 
