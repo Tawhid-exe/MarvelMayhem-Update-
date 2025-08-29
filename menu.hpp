@@ -334,6 +334,7 @@ void handleMenuClick(int button, int state, int mx, int my) {
 						playCharClickSound(); // playing Character Selection sound
 						selectedCharacter = i;
 						selectedCharacterIndexP1 = i + 1;
+						selectedCharacterIndexArcade = i + 1; 
 					}
 
 					// Entering Arena Screen
@@ -604,4 +605,5 @@ void updateBackgroundScroll(Character &player) {
 
 
 #endif 
+
 
