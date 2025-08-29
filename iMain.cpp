@@ -1,312 +1,262 @@
-//#include "iGraphics.h"
-#ifndef CHARACTER_HPP
-#define CHARACTER_HPP
+#include "iGraphics.h"
 #include "menu.hpp"
-#include <cstdlib> // For rand()
-#include <ctime>   // For srand()
-#include <iostream>
-#include <string>
+#include "character.hpp"
+#include "pause.hpp"
 
-using namespace std;
+Character captainAmericaP1;
+Character captainAmericaP2;
+int loadingScreen;
 
-const int MAX_FRAMES = 30;
+// Loading screen variables
+int loadingBarWidth = 0;
+bool loadingDone = false;
+bool goToMainMenu = false;
+bool blinkTextWhite = true;
+static bool assetsLoaded = false;
 
-enum AnimationState {
-	IDLE,
-	WALK,
-	JUMP,
-	ATTACK,
-	SKILL,
-	ULTIMATE,
-	DEAD
-};
+// had to declare the function definition here otherwise it was not working 
+void loadingScreenText();
 
-struct Character{
-	
-	AnimationState characterState;
-	string name;
-	double hp;
-	bool alive;
-	int moveX;
-	int moveY;
-	int baseY; // fixed ground Y
+void iDraw()
+{
+	iClear();
 
+	if (!goToMainMenu)
+	{
+		// Show loading screen
+		iShowImage(0, 10, SCREEN_WIDTH, SCREEN_HEIGHT, loadingScreen);
 
-	// Animation data(hold Image ID) 
-	int idleSprites_R[MAX_FRAMES], idleSprites_L[MAX_FRAMES];
-	int walkSprites_R[MAX_FRAMES], walkSprites_L[MAX_FRAMES];
-	int jumpSprites_R[MAX_FRAMES], jumpSprites_L[MAX_FRAMES];
-	int attackSprites_R[MAX_FRAMES], attackSprites_L[MAX_FRAMES];
-	int skillSprites_R[MAX_FRAMES], skillSprites_L[MAX_FRAMES];
-	int ultimateSprites_R[MAX_FRAMES], ultimateSprites_L[MAX_FRAMES];
-	int deadSprites_R[MAX_FRAMES], deadSprites_L[MAX_FRAMES];              
+		startMainMenuMusic(); // Starting Main Menu Music
 
-	// Frame counts
-	int idleCount_R, idleCount_L;
-	int walkCount_R, walkCount_L;
-	int attackCount_R, attackCount_L;
-	int skillCount_R, skillCount_L;
-	int ultimateCount_R, ultimateCount_L;
-	int deadCount_R, deadCount_L;
-	int jumpCount_R, jumpCount_L;
-
-	// Current animation frame
-	int currentFrame;
-
-	//direction of facing
-	bool facingRight;
-	
-	// Constructor
-	Character()
-		: name("Captain America"),
-		characterState(IDLE),
-		hp(1000),
-		alive(true),
-		moveX(100),
-		moveY(113),
-		baseY(113),
-		facingRight(true),
-		currentFrame(0),
-		idleCount_R(0), idleCount_L(0),
-		walkCount_R(0), walkCount_L(0),
-		jumpCount_R(0), jumpCount_L(0),
-		attackCount_R(0), attackCount_L(0),
-		skillCount_R(0), skillCount_L(0),
-		ultimateCount_R(0), ultimateCount_L(0),
-		deadCount_R(0), deadCount_L(0)
-	{}  // initializer list has been used so the body stays empty
-
-	//initiazile maxFrame for each AnimationState update frames
-	void update() {
-		int maxFrame = 1;
-		switch (characterState) {
-		case IDLE:     maxFrame = facingRight ? idleCount_R : idleCount_L; break;
-		case WALK:     maxFrame = facingRight ? walkCount_R : walkCount_L; break;
-		case JUMP:     maxFrame = facingRight ? jumpCount_R : jumpCount_L; break;
-		case ATTACK:   maxFrame = facingRight ? attackCount_R : attackCount_L; break;
-		case SKILL:    maxFrame = facingRight ? skillCount_R : skillCount_L; break;
-		case ULTIMATE: maxFrame = facingRight ? ultimateCount_R : ultimateCount_L; break;
-		case DEAD:     maxFrame = facingRight ? deadCount_R : deadCount_L; break;
-		}
-		// Updates the current frame
-		if (maxFrame > 0) currentFrame = (currentFrame + 1) % maxFrame;
-		else currentFrame = 0;
+		// Loading bar frame and fill
+		iSetColor(255, 60, 60);
+		iRectangle(390, 35, 500, 25);
+		iFilledRectangle(390, 35, loadingBarWidth, 25);
+		loadingScreenText();
 	}
+	else
+	{
+		// Show the actual menu screen after loading
+		showMenu();
+		
+		// On the gameplay screen, render Character
+		if (currentScreen == 20){
+			showArenaImages();
+			if(selectedCharacterIndexP1 == 2) captainAmericaP1.draw();
+			if(selectedCharacterIndexP2 == 2) captainAmericaP2.draw();
 
 
-	// a pointer is declared and initialized as a null pointer 
-	// this pointer points to each array address in case of each AnimationState
-	void draw() {
-		int* spriteArray = nullptr;
-		int count = 0;
+			// paused button
+			iShowImage(pauseButton.x, pauseButton.y, pauseButton.width, pauseButton.height, pauseButtonImage);
 
-		switch (characterState) {
-		case IDLE:
-			spriteArray = facingRight ? idleSprites_R : idleSprites_L;
-			count = facingRight ? idleCount_R : idleCount_L;
-			break;
-		case WALK:
-			spriteArray = facingRight ? walkSprites_R : walkSprites_L;
-			count = facingRight ? walkCount_R : walkCount_L;
-			break;
-		case JUMP:
-			spriteArray = facingRight ? jumpSprites_R : jumpSprites_L;
-			count = facingRight ? jumpCount_R : jumpCount_L;
-			break;
-		case ATTACK:
-			spriteArray = facingRight ? attackSprites_R : attackSprites_L;
-			count = facingRight ? attackCount_R : attackCount_L;
-			break;
-		case SKILL:
-			spriteArray = facingRight ? skillSprites_R : skillSprites_L;
-			count = facingRight ? skillCount_R : skillCount_L;
-			break;
-		case ULTIMATE:
-			spriteArray = facingRight ? ultimateSprites_R : ultimateSprites_L;
-			count = facingRight ? ultimateCount_R : ultimateCount_L;
-			break;
-		case DEAD:
-			spriteArray = facingRight ? deadSprites_R : deadSprites_L;
-			count = facingRight ? deadCount_R : deadCount_L;
-			break;
+			// If the game is paused, show the pause menu
+			if (currentGameState == PAUSED) {
+				showPauseMenu();
+			}
+		}
+		if (currentScreen == 30){
+			showDynamicArenaBG();
+			if (selectedCharacterIndexP1 == 2) captainAmericaP1.draw();
+			
+			// paused button
+			iShowImage(pauseButton.x, pauseButton.y, pauseButton.width, pauseButton.height, pauseButtonImage);
+
+			// If the game is paused, show the pause menu
+			if (currentGameState == PAUSED) {
+				showPauseMenu();
+			}
 		}
 
-		if (spriteArray && spriteArray[currentFrame] >= 0) {
-			iShowImage(moveX, moveY, 100, 140, spriteArray[currentFrame]);
+	}
+}
+
+void iMouseMove(int mx, int my)
+{
+
+}
+
+void iPassiveMouseMove(int mx, int my)
+{
+	if (goToMainMenu) {
+		// If in game and paused, handle pause menu hover
+		if (currentScreen == 20 && currentGameState == PAUSED) {
+			handlePauseHoverAnimation(mx, my);
 		}
 		else {
-			printf("Invalid image at frame %d\n", currentFrame);
-		}
-	}
-
-
-	// Changes the character's animation state and resets the frame to zero to start animation of the state from beggining again
-	void setState(AnimationState newState) {
-		if (characterState != newState) {
-			characterState = newState;
-			currentFrame = 0;
-		}
-	}
-
-	bool jumpInProgress = false;
-	void handleInputMovement();
-	void handleJump();
-	void handleAttack();
-	void handleDefaultState();
-	void updateBackgroundScroll(Character &player);
-};
-
-//Character c1, c2;
-
-// this fuction loads sprites in sequence from a folder
-// *arr points to int array that hold ID of loaded sprites  
-// count is passed by ref for the func to change the original value
-// *folder is a pointer to string that hold path of my sprites folder
-// *prefix is pointer to string that hold common name of all the sprites in a folder
-//										[walk001.p, walk002.p, ..... etc]
-void loadSprites(int *arr, int &count, const char *folder, const char *prefix, int frameCount){
-	char path[200];  // holds the file path of each image
-	count = 0;  
-	for (int i = 0; i < frameCount; i++) {
-		// Build "folder/prefix1.png", "folder/prefix2.png", …
-		sprintf_s(path, sizeof(path), "%s/%s%d.png", folder, prefix, i + 1);
-
-		// Load once and check for failure
-		int imageID = iLoadImage(path);
-		if (imageID < 0) {
-			printf("Failed to load sprite: %s\n", path);
-			continue; // skip invalid image
-		}
-		arr[count++] = imageID;
-	}
-}
-
-void loadCaptainAmerica(Character &ca) {
-	loadSprites(ca.idleSprites_R, ca.idleCount_R, "SPRITE/CaptainAmerica/IDLE_R", "idle", 1);
-	loadSprites(ca.idleSprites_L, ca.idleCount_L, "SPRITE/CaptainAmerica/IDLE_L", "idle", 1);
-
-	loadSprites(ca.walkSprites_R, ca.walkCount_R, "SPRITE/CaptainAmerica/WALK_R", "walk", 12);
-	loadSprites(ca.walkSprites_L, ca.walkCount_L, "SPRITE/CaptainAmerica/WALK_L", "walk", 12);
-
-	loadSprites(ca.jumpSprites_R, ca.jumpCount_R, "SPRITE/CaptainAmerica/JUMP_R", "jump", 6);
-	loadSprites(ca.jumpSprites_L, ca.jumpCount_L, "SPRITE/CaptainAmerica/JUMP_L", "jump", 6);
-
-	loadSprites(ca.attackSprites_R, ca.attackCount_R, "SPRITE/CaptainAmerica/ATTACK_R", "attack", 8);
-	loadSprites(ca.attackSprites_L, ca.attackCount_L, "SPRITE/CaptainAmerica/ATTACK_L", "attack", 8);
-
-	//loadSprites(ca.skillSprites_R, ca.skillCount_R, "SPRITE/CaptainAmerica/SKILL_R", "skill", 12);
-	//loadSprites(ca.skillSprites_L, ca.skillCount_L, "SPRITE/CaptainAmerica/SKILL_L", "skill", 12);
-
-	loadSprites(ca.ultimateSprites_R, ca.ultimateCount_R, "SPRITE/CaptainAmerica/ULTIMATE_R", "ult", 6);
-	loadSprites(ca.ultimateSprites_L, ca.ultimateCount_L, "SPRITE/CaptainAmerica/ULTIMATE_L", "ult", 6);
-
-	//loadSprites(ca.deadSprites_R, ca.deadCount_R, "SPRITE/CaptainAmerica/DEAD_R", "dead", 10);
-	//loadSprites(ca.deadSprites_L, ca.deadCount_L, "SPRITE/CaptainAmerica/DEAD_L", "dead", 10);
-}
-
-
-
-void handleInputMovement(Character &c1, bool moveRight, bool moveLeft) {
-	if (moveLeft) {
-		c1.facingRight = false;
-		c1.moveX -= 5;
-	}
-	if (moveRight) {
-		c1.facingRight = true;
-		c1.moveX += 5;
-	}
-}
-
-void handleJump(Character &c1, bool wPressed) {
-	if (wPressed && !c1.jumpInProgress) {
-		c1.setState(JUMP);
-		c1.currentFrame = 0;
-		c1.jumpInProgress = true;
-	}
-
-	if (c1.jumpInProgress) {
-		int f = c1.currentFrame;
-		if (f == 0) c1.moveY += 12;
-		else if (f == 1) c1.moveY += 8;
-		else if (f == 2) c1.moveY += 5;
-		else if (f == 3) c1.moveY -= 5;
-		else if (f == 4) c1.moveY -= 8;
-		else if (f == 5) c1.moveY -= 12;
-
-		int maxJump = c1.facingRight ? c1.jumpCount_R : c1.jumpCount_L;
-		if (c1.currentFrame >= maxJump - 1) {
-			c1.moveY = c1.baseY;
-			c1.jumpInProgress = false;
-			c1.setState(IDLE);
+			// Handle main menu hover Animation
+			handleHoverAnimation(mx, my);
 		}
 	}
 }
 
-
-// extra frame count handling needed for single press f and long press f anymation cycle
-void handleAttack(Character &c1, bool fPressed) {
-	if (c1.characterState == ATTACK) {
-		int maxAtk = c1.facingRight ? c1.attackCount_R : c1.attackCount_L;
-		if (c1.currentFrame >= maxAtk - 1) {
-			if (fPressed) {
-				c1.currentFrame = 0;  // holding f attack animation infinite loop
+void iMouse(int button, int state, int mx, int my)
+{
+	if (goToMainMenu) {
+		if (currentScreen == 20) { // Clicks inside the arena screen
+			if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+				if (currentGameState == PAUSED) {
+					// If paused, check for clicks on the pause menu
+					int clickedButtonIndex = handlePauseMenuClick(mx, my);
+					if (clickedButtonIndex == 0) { // Resume
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 1) { // Restart
+						resetCharacters(captainAmericaP1, captainAmericaP2);
+						currentGameState = PLAYING;
+					}
+					else if (clickedButtonIndex == 2) { // Character Selection
+						resetCharacters(captainAmericaP1, captainAmericaP2);
+						currentScreen = 10; // Go back to character selection
+						currentGameState = PLAYING; // Reset state for next time
+					}
+				}
+				else {
+					// If playing, check for clicks on the main pause button
+					if (mx >= pauseButton.x && mx <= pauseButton.x + pauseButton.width &&
+						my >= pauseButton.y && my <= pauseButton.y + pauseButton.height) {
+						currentGameState = PAUSED;
+					}
+				}
 			}
-			else {
-				c1.setState(IDLE);  // release f to stop attacking
-			}
-		}
-		return;
-	}
-	else if (fPressed) {
-		c1.setState(ATTACK);
-	}
-}
-
-
-void handleUltimate(Character &c1, bool qPressed) {
-	if (c1.characterState == ULTIMATE) {
-		int maxUlt = c1.facingRight ? c1.ultimateCount_R : c1.ultimateCount_L;
-		if (c1.currentFrame >= maxUlt - 1) {
-			if (qPressed) {
-				c1.currentFrame = 0;
-			}
-			else {
-				c1.setState(IDLE);
-			}
-		}
-		return;
-	}
-	else if (qPressed) {
-		c1.setState(ULTIMATE);
-	}
-}
-
-
-
-void handleDefaultState(Character &c1, bool moveRight, bool moveLeft) {
-	if (!c1.jumpInProgress && c1.characterState != ATTACK && c1.characterState != ULTIMATE) {
-		if (moveRight || moveLeft) {
-			c1.setState(WALK);
 		}
 		else {
-			c1.setState(IDLE);
-		}
-
-		// Ground check
-		if (c1.moveY < c1.baseY) {
-			c1.moveY = c1.baseY;
+			// Handle menu clicks only after the loading screen
+			handleMenuClick(button, state, mx, my);
 		}
 	}
 }
 
-#endif
+// This function runs at a fixed interval
+// Special Keys:
+// GLUT_KEY_F1, GLUT_KEY_F2, GLUT_KEY_F3, GLUT_KEY_F4, GLUT_KEY_F5, GLUT_KEY_F6, GLUT_KEY_F7, GLUT_KEY_F8, GLUT_KEY_F9, GLUT_KEY_F10, GLUT_KEY_F11, GLUT_KEY_F12, 
+// GLUT_KEY_LEFT, GLUT_KEY_UP, GLUT_KEY_RIGHT, GLUT_KEY_DOWN, GLUT_KEY_PAGE UP, GLUT_KEY_PAGE DOWN, GLUT_KEY_HOME, GLUT_KEY_END, GLUT_KEY_INSERT
+
+void fixedUpdate() {
+	if (!goToMainMenu || currentGameState == PAUSED) return;
+
+	// Versus Mode (screen 20) - Both players
+	if (currentScreen == 20) {
+		// Player 1 controls (WASD + FEQ)
+		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
+		handleDefaultState(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
+		handleJump(captainAmericaP1, isKeyPressed('w'));
+		handleAttack(captainAmericaP1, isKeyPressed('f'));
+		handleUltimate(captainAmericaP1, isKeyPressed('q'));
 
 
+		// Player 2 controls (Arrow keys + )
+		handleInputMovement(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_RIGHT), isSpecialKeyPressed(GLUT_KEY_LEFT));
+		handleDefaultState(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_RIGHT), isSpecialKeyPressed(GLUT_KEY_LEFT));
+		handleJump(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_UP));
+		handleAttack(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_DOWN));
+		handleUltimate(captainAmericaP2, isKeyPressed('0'));
 
+	}
 
+	// Arcade Mode (screen 30) - Only Player 1
+	else if (currentScreen == 30) {
+		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
+		handleDefaultState(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
+		handleJump(captainAmericaP1, isKeyPressed('w'));
+		handleAttack(captainAmericaP1, isKeyPressed('f'));
+		handleUltimate(captainAmericaP1, isKeyPressed('q'));
 
+		updateBackgroundScroll(captainAmericaP1);
+	}
+}
 
+// Handles the loading bar animation on loading screen
+void loadingBar(){
+	if (!loadingDone){
+		loadingBarWidth += 10;
+		if (loadingBarWidth >= 500){
+			loadingBarWidth = 500;
+			loadingDone = true;
+		}
+	}
 
+	else{
+		if (isKeyPressed(' ')){
+			goToMainMenu = true;
+			// Load menu 
+			if (mainMenuScreen == -1){
+				loadMenuAssets();
+				loadCharacterSelectionAssets();
+				loadCharacterSelectionAssetsForArcade();
+				loadArenaAssets();
+				loadPauseAssets();
+				loadDynamicArenaBG();
+			}
+		}
+	}
+}
 
+void loadingScreenText(){
+	// If loading done, show text prompt
+	if (loadingDone){
+		if (blinkTextWhite) {
+			iSetColor(255, 255, 255); // white
+		}
+		else {
+			iSetColor(0, 0, 0); // black
+		}
+		iText(530, 80, "Press SPACE to continue", GLUT_BITMAP_HELVETICA_18);
+	}
+	else{
+		iSetColor(255, 255, 255);
+		iText(390, 70, "Loading...", GLUT_BITMAP_HELVETICA_18);
+	}
+}
 
+void toggleBlinkColor() {
+	blinkTextWhite = !blinkTextWhite;
+}
+
+void updateCharacters() {
+	// Only update character animations if the game is playing
+	if (currentScreen == 20 && currentGameState == PLAYING){
+		if(selectedCharacterIndexP1 == 2) captainAmericaP1.update();
+		if(selectedCharacterIndexP2 == 2) captainAmericaP2.update();
+		// ironMan.update();
+	}
+
+	else if (currentScreen == 30 && currentGameState == PLAYING){
+		if (selectedCharacterIndexP1 == 2) captainAmericaP1.update();
+
+	}
+}
+
+int main()
+{
+	// Initialize graphics window
+	iInitialize(SCREEN_WIDTH, SCREEN_HEIGHT, "Marvel Mayhem");
+
+	//loading screen background image
+	loadingScreen = iLoadImage("BG/loading3.png");
+
+	loadCaptainAmerica(captainAmericaP1);
+	loadCaptainAmerica(captainAmericaP2);
+
+	captainAmericaP1.moveX = 200;        // Player 1 starts on the left
+	captainAmericaP1.facingRight = true; // Player 1 faces right
+
+	captainAmericaP2.moveX = 980;         // Player 2 starts on the right  
+	captainAmericaP2.facingRight = false; // Player 2 faces left
+
+	iSetTimer(350, toggleBlinkColor); // 350 ms = 0.35 sec toggle
+
+	iSetTimer(10, loadingBar);
+
+	iSetTimer(25, fixedUpdate);
+
+	iSetTimer(100, updateCharacters);
+
+	iSetTimer(100, loadArenaAssets);
+
+	iSetTimer(100, loadDynamicArenaBG);
+	
+	iStart(); // Start the graphics engine
+
+	return 0;
+}
 
