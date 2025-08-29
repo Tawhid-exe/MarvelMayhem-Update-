@@ -262,7 +262,7 @@ void updateCharacters() {
 	}
 
 	// Update arcade characters' animations	
-	else if (currentScreen == 30 && currentGameState == PLAYING) {		else if (currentScreen == 30 && currentGameState == PLAYING){
+	else if (currentScreen == 30 && currentGameState == PLAYING){
 		updateArcadeCharacters();
 
 	}
@@ -301,6 +301,7 @@ int main()
 
 	return 0;
 }
+
 
 
 
