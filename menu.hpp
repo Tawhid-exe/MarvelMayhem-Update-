@@ -3,8 +3,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "character.hpp"
-#include "music.hpp"
 //#include "character.hpp"
 
 #define BUTTON_COUNT 4
@@ -25,7 +23,7 @@
 int selectedCharacterIndexP1 = 2; //default // index for spawning character in areana
 int selectedCharacterIndexP2 = 2; //default
 
-int selectedCharacterIndexArcade = -1;
+int selectedCharacterIndexArcade = -1; //store the selected character for Arcade Mode
 // 1 for ironman
 // 2 for cap
 // 3 for thor
@@ -58,12 +56,6 @@ int selectionImages[2];
 // Variables for Arena
 int arenaImages[ARENA_COUNT];
 
-//variables for dynamicBackground
-int dynamicBgImage;
-float bgX1 = 0;
-float bgX2 = SCREEN_WIDTH - 20;
-float bgScrollSpeed = 10.0f;
-
 // Back button variables
 int backButtonImage;
 bool backButtonHover = false;
@@ -86,7 +78,6 @@ Button characterButtonsP2[CHARACTER_COUNT]; // Player 2 buttons
 void showMenu() {
 	if (currentScreen == -1) { // On the Main Menu
 		iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mainMenuScreen);
-		startMainMenuMusic(); // Starting Main Menu Music
 
 		// main menu buttons 
 		for (int i = 0; i < BUTTON_COUNT; i++) {
@@ -103,8 +94,6 @@ void showMenu() {
 		}
 	}
 	else if (currentScreen == 0) { // Play Sub-Menu
-		startMainMenuMusic(); // Starting Main Menu Music
-
 		iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, subMenuBackground);
 		iSetColor(253, 240, 213);
 		iText(590, 680, "Select Mode", GLUT_BITMAP_TIMES_ROMAN_24);
@@ -160,9 +149,6 @@ void showMenu() {
 		}
 	}
 	else if (currentScreen == 10 || currentScreen == 11) { // play options selection
-		stopArenaMusic(); // Stopping Arena Music
-		startMainMenuMusic(); // staring main menu musicf
-
 		// Display which option was chosen
 		if (currentScreen == 10) {
 			iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, characterSelectionBackground);
@@ -247,9 +233,7 @@ void showMenu() {
 		}
 	}
 	else if (currentScreen == 30) {
-		stopMainMenuMusic(); // stoping main meny music
 		iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, arenaImages[0]);
-		startArenaMusic(); // Starting Arena Music
 	}
 }
 
@@ -260,7 +244,6 @@ void handleMenuClick(int button, int state, int mx, int my) {
 				if (mx >= buttons[i].x && mx <= buttons[i].x + buttons[i].width &&
 					my >= buttons[i].y && my <= buttons[i].y + buttons[i].height) {
 					if (i == 3) { exit(0); } // Exit button
-					playClickSound(); // playing click sound
 					currentScreen = i; // Sets screen to 0 (Play), 1 (Settings), or 2 (About)
 					break;
 				}
@@ -271,7 +254,6 @@ void handleMenuClick(int button, int state, int mx, int my) {
 			for (int i = 0; i < 2; i++) {
 				if (mx >= optionButtons[i].x && mx <= optionButtons[i].x + optionButtons[i].width &&
 					my >= optionButtons[i].y && my <= optionButtons[i].y + optionButtons[i].height) {
-					playClickSound(); // playing click sound
 					currentScreen = 10 + i; // Set screen to 10 or 11
 					return; // Exit function after handling click
 				}
@@ -279,7 +261,6 @@ void handleMenuClick(int button, int state, int mx, int my) {
 			// Check for click on the back button
 			if (mx >= backButton.x && mx <= backButton.x + backButton.width &&
 				my >= backButton.y && my <= backButton.y + backButton.height) {
-				playClickSound(); // playing click sound
 				currentScreen = -1; // Go back to the main menu
 			}
 		}
@@ -288,7 +269,6 @@ void handleMenuClick(int button, int state, int mx, int my) {
 			// Check for back button click
 			if (mx >= backButton.x && mx <= backButton.x + backButton.width &&
 				my >= backButton.y && my <= backButton.y + backButton.height) {
-				playClickSound(); // playing click sound
 				currentScreen = -1; // Go back to the main menu
 			}
 		}
@@ -296,7 +276,6 @@ void handleMenuClick(int button, int state, int mx, int my) {
 			// Check for back button click
 			if (mx >= backButton.x && mx <= backButton.x + backButton.width &&
 				my >= backButton.y && my <= backButton.y + backButton.height) {
-				playClickSound(); // playing click sound
 				currentScreen = 0; // Go back to the Play Sub-Menu
 			}
 			// 1v1 character selection
@@ -305,21 +284,20 @@ void handleMenuClick(int button, int state, int mx, int my) {
 					// Player 1 selection
 					if (mx >= characterButtonsP1[i].x && mx <= characterButtonsP1[i].x + characterButtonsP1[i].width &&
 						my >= characterButtonsP1[i].y && my <= characterButtonsP1[i].y + characterButtonsP1[i].height) {
-						playCharClickSound(); // playing Character Selection sound
 						selectedCharacterP1 = i;
 						selectedCharacterIndexP1 = i+1;
+						//printf(" %d", selectedCharacterIndexP1);
 					}
 					// Player 2 selection
 					if (mx >= characterButtonsP2[i].x && mx <= characterButtonsP2[i].x + characterButtonsP2[i].width &&
 						my >= characterButtonsP2[i].y && my <= characterButtonsP2[i].y + characterButtonsP2[i].height) {
-						playCharClickSound(); // playing Character Selection sound
 						selectedCharacterP2 = i;
 						selectedCharacterIndexP2 = i + 1;
+						//printf(" %d", selectedCharacterIndexP2);
 					}
 					// Entering Arena Screen
 					if (selectedCharacterP1 != -1 && selectedCharacterP2 != -1) {
 						if (mx >= 520 && mx <= 520 + 250 && my >= 50 && my <= 50 + 100) {
-							playClickSound(); // playing click sound
 							currentScreen = 20;
 						}
 					}
@@ -330,17 +308,14 @@ void handleMenuClick(int button, int state, int mx, int my) {
 				for (int i = 0; i < CHARACTER_COUNT; i++) {
 					// Character selection
 					if (mx >= characterButtons[i].x && mx <= characterButtons[i].x + characterButtons[i].width &&
-						my >= characterButtons[i].y && my <= characterButtons[i].y + characterButtons[i].height) {
-						playCharClickSound(); // playing Character Selection sound
+						my >= characterButtons[i].y && my <= characterButtons[i].y + characterButtonsP1[i].height) {
 						selectedCharacter = i;
-						selectedCharacterIndexP1 = i + 1;
-						selectedCharacterIndexArcade = i + 1; 
+						selectedCharacterIndexArcade = i + 1; // FIX: This line was missing
 					}
 
 					// Entering Arena Screen
 					if (selectedCharacter != -1) {
 						if (mx >= 520 && mx <= 520 + 250 && my >= 60 && my <= 60 + 100) {
-							playClickSound(); // playing click sound
 							currentScreen = 30;
 						}
 					}
@@ -512,6 +487,7 @@ void loadCharacterSelectionAssets() {
 		characterButtonsP2[i].width = charWidth;
 		characterButtonsP2[i].height = charHeight;
 	}
+
 }
 void loadCharacterSelectionAssetsForArcade() {
 	// Loading Character and Arena Images
@@ -545,67 +521,10 @@ void loadArenaAssets(){
 	// Load Arena Images
 	arenaImages[0] = iLoadImage("BG/arena1.jpg");
 }
+
 void showArenaImages(){
-	stopMainMenuMusic();  // stoping main menu music
 	iShowImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, arenaImages[0]);
-	startArenaMusic(); // Starting Arena Music
 }
-
-
-int bgfix;
- // works on arcade mode dynamic BG
-void loadDynamicArenaBG(){
-	dynamicBgImage = iLoadImage("BG/arena2.jpg");
-}
-
-void showDynamicArenaBG(){
-	iShowImage(bgX1, 30, SCREEN_WIDTH, SCREEN_HEIGHT, dynamicBgImage);
-	iShowImage(bgX2, 30, SCREEN_WIDTH, SCREEN_HEIGHT, dynamicBgImage);
-	
-}
-
-
-void updateBackgroundScroll(Character &player) {
-    static int lastPlayerX = player.moveX;
-    
-    // detect movement
-    int deltaX = player.moveX - lastPlayerX;
-    
-    // Only scroll when character moving
-    if (deltaX != 0) {
-        if (deltaX > 0) {
-            bgX1 -= bgScrollSpeed;
-            bgX2 -= bgScrollSpeed;
-            
-            // Reset positions when off-screen
-            if (bgX1 <= -SCREEN_WIDTH) {
-                bgX1 = bgX2 + SCREEN_WIDTH -20;
-            }
-            if (bgX2 <= -SCREEN_WIDTH) {
-				bgX2 = bgX1 + SCREEN_WIDTH - 20;
-            }
-        }
-        else if (deltaX < 0) {
-            bgX1 += bgScrollSpeed;
-            bgX2 += bgScrollSpeed;
-            
-            // Reset positions when off-screen
-            if (bgX1 >= SCREEN_WIDTH) {
-				bgX1 = bgX2 - SCREEN_WIDTH + 20;
-            }
-            if (bgX2 >= SCREEN_WIDTH) {
-				bgX2 = bgX1 - SCREEN_WIDTH + 20;
-            }
-        }
-    }
-    
-    lastPlayerX = player.moveX;
-}
-
-
 
 #endif 
 
-
-
-//alsdkjflaskdjflskadjf
