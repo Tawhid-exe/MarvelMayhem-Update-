@@ -19,10 +19,8 @@ static bool assetsLoaded = false;
 
 int previousScreen = -1; // To track screen transitions
 
-
 // had to declare the function definition here otherwise it was not working
 void loadingScreenText();
-
 
 void iDraw()
 {
@@ -32,6 +30,8 @@ void iDraw()
 	{
 		// Show loading screen
 		iShowImage(0, 10, SCREEN_WIDTH, SCREEN_HEIGHT, loadingScreen);
+
+		startMainMenuMusic(); // Starting Main Menu Music
 
 		// Loading bar frame and fill
 		iSetColor(255, 60, 60);
@@ -61,8 +61,9 @@ void iDraw()
 		}
 		// Logic for Arcade Mode Screen (30)
 		else if (currentScreen == 30) {
-			// Check if we just entered the arcade screen to load characters once
+			// Check if  just entered the arcade screen to load characters once
 			if (previousScreen != 30) {
+				showDynamicArenaBG();
 				loadArcadeCharacters();
 			}
 
@@ -167,19 +168,25 @@ void iMouse(int button, int state, int mx, int my)
 
 // This function runs at a fixed interval
 void fixedUpdate() {
-	// 1v1 Mode Controls
-	if (goToMainMenu && currentScreen == 20 && currentGameState != PAUSED) {
-		// Player 1 controls (WASD + F)
+	if (!goToMainMenu || currentGameState == PAUSED) return;
+
+	// Versus Mode (screen 20) - Both players
+	if (currentScreen == 20) {
+		// Player 1 controls (WASD + FEQ)
 		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
 		handleDefaultState(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
 		handleJump(captainAmericaP1, isKeyPressed('w'));
 		handleAttack(captainAmericaP1, isKeyPressed('f'));
+		handleUltimate(captainAmericaP1, isKeyPressed('q'));
 
-		// Player 2 controls (Arrow keys + Down Arrow)
+
+		// Player 2 controls (Arrow keys + )
 		handleInputMovement(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_RIGHT), isSpecialKeyPressed(GLUT_KEY_LEFT));
 		handleDefaultState(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_RIGHT), isSpecialKeyPressed(GLUT_KEY_LEFT));
 		handleJump(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_UP));
 		handleAttack(captainAmericaP2, isSpecialKeyPressed(GLUT_KEY_DOWN));
+		handleUltimate(captainAmericaP2, isKeyPressed('0'));
+
 	}
 	// Arcade Mode Controls
 	else if (goToMainMenu && currentScreen == 30 && currentGameState != PAUSED) {
@@ -188,6 +195,9 @@ void fixedUpdate() {
 		handleDefaultState(arcadePlayer, isKeyPressed('d'), isKeyPressed('a'));
 		handleJump(arcadePlayer, isKeyPressed('w'));
 		handleAttack(arcadePlayer, isKeyPressed('f'));
+		handleUltimate(arcadePlayer, isKeyPressed('q'));
+
+		updateBackgroundScroll(captainAmericaP1);
 
 		// AI Controls
 		handleJump(arcadeAI, false);
@@ -280,14 +290,12 @@ int main()
 
 	iSetTimer(100, loadArenaAssets);
 
+	iSetTimer(100, loadDynamicArenaBG);
+
 	iStart(); // Start the graphics engine
 
 	return 0;
 }
-
-
-
-// asdjflasdjflskdj
 
 
 
