@@ -19,7 +19,10 @@ static bool assetsLoaded = false;
 
 int previousScreen = -1; // To track screen transitions
 
+
 // had to declare the function definition here otherwise it was not working 
+
+
 void loadingScreenText();
 
 void iDraw()
@@ -59,7 +62,9 @@ void iDraw()
 				showPauseMenu();
 			}
 		}
+
 		else if (currentScreen == 30){
+
 
 			showDynamicArenaBG();
 			if (selectedCharacterIndexP1 == 2) captainAmericaP1.draw();
@@ -189,6 +194,7 @@ void fixedUpdate() {
 
 	}
 
+
 	// Arcade Mode (screen 30) - Only Player 1
 	else if (currentScreen == 30) {
 		handleInputMovement(captainAmericaP1, isKeyPressed('d'), isKeyPressed('a'));
@@ -196,6 +202,8 @@ void fixedUpdate() {
 		handleJump(captainAmericaP1, isKeyPressed('w'));
 		handleAttack(captainAmericaP1, isKeyPressed('f'));
 		handleUltimate(captainAmericaP1, isKeyPressed('q'));
+
+
 
 		updateBackgroundScroll(captainAmericaP1);
 
@@ -296,7 +304,7 @@ int main()
 	iSetTimer(100, loadArenaAssets);
 
 	iSetTimer(100, loadDynamicArenaBG);
-	
+
 	iStart(); // Start the graphics engine
 
 	return 0;

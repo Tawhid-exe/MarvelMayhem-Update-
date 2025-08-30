@@ -1,6 +1,7 @@
 ﻿//#include "iGraphics.h"
 #ifndef CHARACTER_HPP
 #define CHARACTER_HPP
+#include "menu.hpp"
 #include <cstdlib> // For rand()
 #include <ctime>   // For srand()
 #include <iostream>
@@ -29,7 +30,6 @@ struct Character{
 	int moveX;
 	int moveY;
 	int baseY; // fixed ground Y
-
 
 	// Animation data(hold Image ID) 
 	int idleSprites_R[MAX_FRAMES], idleSprites_L[MAX_FRAMES];
@@ -92,7 +92,6 @@ struct Character{
 		else currentFrame = 0;
 	}
 
-
 	// a pointer is declared and initialized as a null pointer 
 	// this pointer points to each array address in case of each AnimationState
 	void draw() {
@@ -138,7 +137,6 @@ struct Character{
 		}
 	}
 
-
 	// Changes the character's animation state and resets the frame to zero to start animation of the state from beggining again
 	void setState(AnimationState newState) {
 		if (characterState != newState) {
@@ -152,6 +150,7 @@ struct Character{
 	void handleJump();
 	void handleAttack();
 	void handleDefaultState();
+	void updateBackgroundScroll(Character &player);
 };
 
 //Character c1, c2;
@@ -192,11 +191,11 @@ void loadCaptainAmerica(Character &ca) {
 	loadSprites(ca.attackSprites_R, ca.attackCount_R, "SPRITE/CaptainAmerica/ATTACK_R", "attack", 8);
 	loadSprites(ca.attackSprites_L, ca.attackCount_L, "SPRITE/CaptainAmerica/ATTACK_L", "attack", 8);
 
-	//loadSprites(ca.skillSprites_R, ca.skillCount_R, "SPRITE/CaptainAmerica/SKILL_R", "skill", 15);
-	//loadSprites(ca.skillSprites_L, ca.skillCount_L, "SPRITE/CaptainAmerica/SKILL_L", "skill", 15);
+	//loadSprites(ca.skillSprites_R, ca.skillCount_R, "SPRITE/CaptainAmerica/SKILL_R", "skill", 12);
+	//loadSprites(ca.skillSprites_L, ca.skillCount_L, "SPRITE/CaptainAmerica/SKILL_L", "skill", 12);
 
-	//loadSprites(ca.ultimateSprites_R, ca.ultimateCount_R, "SPRITE/CaptainAmerica/ULTIMATE_R", "ultimate", 20);
-	//loadSprites(ca.ultimateSprites_L, ca.ultimateCount_L, "SPRITE/CaptainAmerica/ULTIMATE_L", "ultimate", 20);
+	loadSprites(ca.ultimateSprites_R, ca.ultimateCount_R, "SPRITE/CaptainAmerica/ULTIMATE_R", "ult", 6);
+	loadSprites(ca.ultimateSprites_L, ca.ultimateCount_L, "SPRITE/CaptainAmerica/ULTIMATE_L", "ult", 6);
 
 	//loadSprites(ca.deadSprites_R, ca.deadCount_R, "SPRITE/CaptainAmerica/DEAD_R", "dead", 10);
 	//loadSprites(ca.deadSprites_L, ca.deadCount_L, "SPRITE/CaptainAmerica/DEAD_L", "dead", 10);
@@ -238,25 +237,44 @@ void handleJump(Character &c1, bool wPressed) {
 	}
 }
 
+// extra frame count handling needed for single press f and long press f anymation cycle
 void handleAttack(Character &c1, bool fPressed) {
-	if (c1.jumpInProgress && fPressed) {
-		c1.setState(ATTACK);
-	}
 	if (c1.characterState == ATTACK) {
 		int maxAtk = c1.facingRight ? c1.attackCount_R : c1.attackCount_L;
 		if (c1.currentFrame >= maxAtk - 1) {
 			if (fPressed) {
+				c1.currentFrame = 0;  // holding f attack animation infinite loop
+			}
+			else {
+				c1.setState(IDLE);  // release f to stop attacking
+			}
+		}
+		return;
+	}
+	else if (fPressed) {
+		c1.setState(ATTACK);
+	}
+}
+
+
+void handleUltimate(Character &c1, bool qPressed) {
+	if (c1.characterState == ULTIMATE) {
+		int maxUlt = c1.facingRight ? c1.ultimateCount_R : c1.ultimateCount_L;
+		if (c1.currentFrame >= maxUlt - 1) {
+			if (qPressed) {
 				c1.currentFrame = 0;
 			}
 			else {
 				c1.setState(IDLE);
 			}
 		}
+		return;
 	}
-	else if (fPressed) {
-		c1.setState(ATTACK);
+	else if (qPressed) {
+		c1.setState(ULTIMATE);
 	}
 }
+
 
 
 
@@ -390,5 +408,3 @@ void draw() {
 
 
 
-
-//;lkasdjflaksdjflksdjf
