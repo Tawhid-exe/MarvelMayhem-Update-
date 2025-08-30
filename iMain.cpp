@@ -63,8 +63,7 @@ void iDraw()
 
 			showDynamicArenaBG();
 			if (selectedCharacterIndexP1 == 2) captainAmericaP1.draw();
-
-			// draw AI opponent in arcade mode
+			
 			drawArcadeAI();
 
 			// paused button
@@ -87,7 +86,7 @@ void iPassiveMouseMove(int mx, int my)
 {
 	if (goToMainMenu) {
 		// If in game and paused, handle pause menu hover
-		if (currentScreen == 20 && currentGameState == PAUSED) {
+		if ((currentScreen == 20 || currentScreen == 30) && currentGameState == PAUSED) {
 			handlePauseHoverAnimation(mx, my);
 		}
 		else {
@@ -96,6 +95,7 @@ void iPassiveMouseMove(int mx, int my)
 		}
 	}
 }
+
 
 void iMouse(int button, int state, int mx, int my)
 {
@@ -262,7 +262,6 @@ void updateCharacters() {
 
 	else if (currentScreen == 30 && currentGameState == PLAYING){
 		if (selectedCharacterIndexP1 == 2) captainAmericaP1.update();
-		// update animations of ai character in arcade mode
 		updateArcadeCharacters();
 	}
 }
@@ -275,7 +274,6 @@ int main()
 	//loading screen background image
 	loadingScreen = iLoadImage("BG/loading3.png");
 
-	// load Arcade ai characters
 	loadArcadeCharacters();
 
 	loadCaptainAmerica(captainAmericaP1);
@@ -303,4 +301,3 @@ int main()
 
 	return 0;
 }
-
